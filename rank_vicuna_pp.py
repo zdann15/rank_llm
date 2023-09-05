@@ -37,11 +37,10 @@ class RankVicuna(RankLLM):
         return 200
     
     def _add_prefix_prompt(self, query, num, conv):
-        conv.append_message(conv.roles[0],f'You are RankVicuna, an intelligent assistant that can rank passages based on their relevancy to the query. I will provide you with {num} passages, each indicated by number identifier []. \nRank the passages based on their relevance to query: {query}.')
-        conv.append_message(conv.roles[1], 'Okay, please provide the passages.')
+        return f'I will provide you with {num} passages, each indicated by a numerical identifier []. Rank the passages based on their relevance to the search query: {query}.\n'
 
     def _add_post_prompt(self, query, num, conv):
-        conv.append_message(conv.roles[0], f'Search Query: {query}. \nRank the {num} passages above based on their relevance to the search query. The passages should be listed in descending order using identifiers. The most relevant passages should be listed first. The output format should be [] > [], e.g., [1] > [2]. Only response the ranking results, do not say any word or explain.')
+            return f'Search Query: {query}.\nRank the {num} passages above based on their relevance to the search query. All the passages should be included and listed using identifiers, in descending order of relevance. The output format should be [] > [], e.g., [4] > [2], Only respond with the ranking results, do not say any word or explain.'
 
     def create_prompt(self, retrieved_result, rank_start=0, rank_end=100):
         query = retrieved_result['query']
@@ -50,8 +49,9 @@ class RankVicuna(RankLLM):
         max_length = 300
         while True:
             conv = get_conversation_template(self.model_)
-            self._add_prefix_prompt(query, num, conv)
+            prefix = self._add_prefix_prompt(query, num, conv)
             rank = 0
+            input_context = f"{prefix}\n"
             for hit in retrieved_result['hits'][rank_start: rank_end]:
                 rank += 1
                 content = hit['content']
@@ -59,9 +59,10 @@ class RankVicuna(RankLLM):
                 content = content.strip()
                 # For Japanese should cut by character: content = content[:int(max_length)]
                 content = ' '.join(content.split()[:int(max_length)])
-                conv.append_message(conv.roles[0], f'[{rank}] {content}')
-                conv.append_message(conv.roles[1], f'Received passage [{rank}].')
-            self._add_post_prompt(query, num, conv)
+                input_context += f'[{rank}] {content}\n'
+            
+            input_context += (self._add_post_prompt(query, num, conv))
+            conv.append_message(conv.roles[0], input_context)
             prompt = conv.get_prompt()
             num_tokens = self.get_num_tokens(prompt)
             if num_tokens <= self.max_tokens() - self.num_output_tokens():
@@ -78,7 +79,7 @@ class RankVicuna(RankLLM):
 
 def main(args):
     context_size = 4096
-    dataset = 'dl19'
+    dataset = args.dataset
     prompt_mode = PromptMode.RANK_GPT
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     agent = RankVicuna(args.model_path, context_size, dataset, prompt_mode, device, args.num_gpus)
@@ -102,7 +103,7 @@ def main(args):
     aggregated_prompts = []
     aggregated_responses = [] 
     for result in tqdm(retrieved_results):
-        rerank_result, in_token_count, out_token_count, prompts, responses  = agent.sliding_windows(result, rank_start=0, rank_end=20, window_size=20, step=10)
+        rerank_result, in_token_count, out_token_count, prompts, responses  = agent.sliding_windows(result, rank_start=0, rank_end=args.rank_end, window_size=20, step=10)
         rerank_results.append(rerank_result)
         input_token_counts.append(in_token_count)
         output_token_counts.append(out_token_count)
@@ -112,14 +113,19 @@ def main(args):
     print(f'total input token count={sum(input_token_counts)}')
     print(f'output_token_counts={output_token_counts}')
     print(f'total output token count={sum(output_token_counts)}')
-    file_name = agent.write_rerank_results(rerank_results, input_token_counts, output_token_counts, aggregated_prompts, aggregated_responses)
+    file_name = agent.write_rerank_results(rerank_results, input_token_counts, output_token_counts, aggregated_prompts, aggregated_responses, args.model_name)
     from trec_eval import EvalFunction
+    EvalFunction.eval(['-c', '-m', 'ndcg_cut.1', TOPICS[dataset], file_name])
+    EvalFunction.eval(['-c', '-m', 'ndcg_cut.5', TOPICS[dataset], file_name])
     EvalFunction.eval(['-c', '-m', 'ndcg_cut.10', TOPICS[dataset], file_name])
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--dataset', type=str, required=True, help='Dataset')
     parser.add_argument('--model_path', type=str, required=True, help='Path to the model')
+    parser.add_argument('--model_name', type=str, required=True, help='Name of the model')
+    parser.add_argument('--rank_end', type=int, default=20, help='Rank end')
     parser.add_argument('--num_gpus', type=int, default=1, help='Number of GPUs to use')
     args = parser.parse_args()
     main(args)

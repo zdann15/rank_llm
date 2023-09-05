@@ -5,6 +5,7 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from tqdm import tqdm
+from typing import List
 
 class PromptMode(Enum):
     UNSPECIFIED = 0
@@ -48,7 +49,9 @@ class RankLLM(ABC):
 
     def permutation_pipeline(self, result, rank_start=0, rank_end=100):
         prompt, in_token_count = self.create_prompt(result, rank_start, rank_end)
+        print(prompt)
         permutation, out_token_count = self.run_llm(prompt)
+        print(self.run_llm(prompt))
         rerank_result = self.receive_permutation(result, permutation, rank_start, rank_end)
         return rerank_result, in_token_count, out_token_count, prompt, permutation
     
@@ -111,7 +114,7 @@ class RankLLM(ABC):
         new_response = new_response.strip()
         return new_response
 
-    def _remove_duplicate(self, response:list[int]):
+    def _remove_duplicate(self, response: List[int]):
         new_response = []
         for c in response:
             if c not in new_response:
@@ -134,10 +137,11 @@ class RankLLM(ABC):
                 item['hits'][j + rank_start]['score'] = cut_range[j]['score']
         return item
     
-    def write_rerank_results(self, rerank_results, input_token_counts, output_token_counts, prompts, responses):
+    def write_rerank_results(self, rerank_results, input_token_counts, output_token_counts, prompts, responses, use_other_name=None):
         # write rerank results
         Path("rerank_results/").mkdir(parents=True, exist_ok=True)
-        result_file_name = f'rerank_results/{self.model_}_{self.context_size_}_{self.prompt_mode_}_{self.dataset_}_{datetime.isoformat(datetime.now())}.txt'
+        time = datetime.isoformat(datetime.now())
+        result_file_name = f'rerank_results/{self.model_}_{self.context_size_}_{self.prompt_mode_}_{self.dataset_}_{time}.trec' if not use_other_name else f'rerank_results/{use_other_name}_{self.context_size_}_{self.prompt_mode_}_{self.dataset_}_{time}.trec'
         with open(result_file_name, 'w') as f:
             for i in range(len(rerank_results)):
                 rank = 1
@@ -147,7 +151,7 @@ class RankLLM(ABC):
                     rank += 1
         # Write token counts
         Path("token_counts/").mkdir(parents=True, exist_ok=True)
-        count_file_name = f'token_counts/{self.model_}_{self.context_size_}_{self.prompt_mode_}_{self.dataset_}_{datetime.isoformat(datetime.now())}.txt'
+        count_file_name = f'token_counts/{self.model_}_{self.context_size_}_{self.prompt_mode_}_{self.dataset_}_{time}.txt' if not use_other_name else f'token_counts/{use_other_name}_{self.context_size_}_{self.prompt_mode_}_{self.dataset_}_{time}.txt'
         counts = {}
         for i, (in_count, out_count) in enumerate(zip(input_token_counts, output_token_counts)):
             counts[rerank_results[i]['query']] = (in_count, out_count)
@@ -155,7 +159,8 @@ class RankLLM(ABC):
             json.dump(counts, f, indent = 4)
         # Write prompts and responses
         Path("prompts_and_responses/").mkdir(parents=True, exist_ok=True)
-        with open(f'prompts_and_responses/{self.model_}_{self.context_size_}_{self.prompt_mode_}_{self.dataset_}_{datetime.isoformat(datetime.now())}.json', 'w') as f:
+        prompt_file_name = f'prompts_and_responses/{self.model_}_{self.context_size_}_{self.prompt_mode_}_{self.dataset_}_{time}.json' if not use_other_name else f'prompts_and_responses/{use_other_name}_{self.context_size_}_{self.prompt_mode_}_{self.dataset_}_{time}.json'
+        with open(prompt_file_name, 'w') as f:
             for (p, r) in zip(prompts, responses):
                 json.dump({"prompt": p, "response": r}, f, indent = 4)
                 f.write(', ')
