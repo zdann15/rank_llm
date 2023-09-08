@@ -6,7 +6,11 @@ from tqdm import tqdm
 from pyserini_retriever import PyseriniRetriever
 from topics_dict import TOPICS
 import argparse
+from ftfy import fix_text
+import re
 
+def replace_number(s):
+    return re.sub(r'\[(\d+)\]', r'(\1)', s)
 
 class RankVicuna(RankLLM):
     def __init__(self, model, context_size, dataset, prompt_mode, device, num_gpus):
@@ -48,7 +52,8 @@ class RankVicuna(RankLLM):
 
         max_length = 300
         while True:
-            conv = get_conversation_template(self.model_)
+            # conv = get_conversation_template(self.model_)
+            conv = get_conversation_template('vicuna_v1.1')
             prefix = self._add_prefix_prompt(query, num, conv)
             rank = 0
             input_context = f"{prefix}\n"
@@ -59,16 +64,17 @@ class RankVicuna(RankLLM):
                 content = content.strip()
                 # For Japanese should cut by character: content = content[:int(max_length)]
                 content = ' '.join(content.split()[:int(max_length)])
-                input_context += f'[{rank}] {content}\n'
+                input_context += f'[{rank}] {replace_number(content)}\n'
             
             input_context += (self._add_post_prompt(query, num, conv))
             conv.append_message(conv.roles[0], input_context)
-            prompt = conv.get_prompt()
+            prompt = conv.get_prompt() + " ASSISTANT:"
+            prompt = fix_text(prompt)
             num_tokens = self.get_num_tokens(prompt)
             if num_tokens <= self.max_tokens() - self.num_output_tokens():
                 break
             else:
-                max_length -= max(1, (num_tokens - self.max_tokens() + self.num_output_tokens()) // (rank_end- rank_start))    
+                max_length -= max(1, (num_tokens - self.max_tokens() + self.num_output_tokens()) // (rank_end - rank_start))
         return prompt, self.get_num_tokens(prompt)
 
     def get_num_tokens(self, messages):
