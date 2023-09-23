@@ -168,6 +168,7 @@ def main():
                                             [
                                                 "-c",
                                                 "-m",
+                                                "-l2"
                                                 "map_cut.100",
                                                 TOPICS[dataset],
                                                 f,

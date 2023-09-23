@@ -1,0 +1,218 @@
+{
+    "are naturalization records public information": [
+        17113,
+        819
+    ],
+    "do google docs auto save": [
+        19550,
+        819
+    ],
+    "how long does it take to remove wisdom tooth": [
+        20329,
+        819
+    ],
+    "why is pete rose banned from hall of fame": [
+        17219,
+        819
+    ],
+    "can fever cause miscarriage early pregnancy": [
+        22749,
+        819
+    ],
+    "does mississippi have an income tax": [
+        19048,
+        819
+    ],
+    "when did family feud come out?": [
+        17037,
+        819
+    ],
+    "what the best way to get clothes white": [
+        23045,
+        819
+    ],
+    "who is rep scalise?": [
+        18078,
+        819
+    ],
+    "why do hunters pattern their shotguns?": [
+        20050,
+        819
+    ],
+    "who killed nicholas ii of russia": [
+        19097,
+        819
+    ],
+    "what amino produces carnitine": [
+        22406,
+        819
+    ],
+    "meaning of shebang": [
+        20178,
+        819
+    ],
+    "what is a nonconformity? earth science": [
+        17239,
+        819
+    ],
+    "what type of tissue are bronchioles": [
+        23094,
+        819
+    ],
+    "what is the un fao": [
+        18098,
+        819
+    ],
+    "average wedding dress alteration cost": [
+        24731,
+        819
+    ],
+    "what metal are hip replacements made of": [
+        18419,
+        819
+    ],
+    "define pareto chart in statistics": [
+        17895,
+        819
+    ],
+    "what is reba mcentire's net worth": [
+        18448,
+        819
+    ],
+    "what is chronometer who invented it": [
+        19365,
+        819
+    ],
+    "what is a statutory deed": [
+        17972,
+        819
+    ],
+    "when did rock n roll begin?": [
+        20244,
+        819
+    ],
+    "dog day afternoon meaning": [
+        20145,
+        819
+    ],
+    "average annual income data analyst": [
+        23621,
+        819
+    ],
+    "what are best foods to lower cholesterol": [
+        24124,
+        819
+    ],
+    "how much would it cost to install my own wind turbine": [
+        23466,
+        819
+    ],
+    "define etruscans": [
+        18483,
+        819
+    ],
+    "define bmt medical": [
+        18327,
+        819
+    ],
+    "where is the show shameless filmed": [
+        18695,
+        819
+    ],
+    "what is mamey": [
+        24492,
+        819
+    ],
+    "how often to button quail lay eggs": [
+        21168,
+        819
+    ],
+    "how many sons robert kraft has": [
+        17785,
+        819
+    ],
+    "ia suffix meaning": [
+        20128,
+        819
+    ],
+    "define: geon": [
+        18755,
+        819
+    ],
+    "who sings monk theme song": [
+        17121,
+        819
+    ],
+    "what type of conflict does della face in o, henry the gift of the magi": [
+        19940,
+        819
+    ],
+    "describe how muscles and bones work together to produce movement": [
+        24369,
+        819
+    ],
+    "what is chaff and flare": [
+        19531,
+        819
+    ],
+    "definition of laudable": [
+        19050,
+        819
+    ],
+    "how old is vanessa redgrave": [
+        20811,
+        819
+    ],
+    "what carvedilol used for": [
+        19462,
+        819
+    ],
+    "what does it mean if your tsh is low": [
+        22302,
+        819
+    ],
+    "is caffeine an narcotic": [
+        23437,
+        819
+    ],
+    "how does granulation tissue start": [
+        19278,
+        819
+    ],
+    "why did the ancient egyptians call their land kemet, or black land?": [
+        20908,
+        819
+    ],
+    "difference between a company's strategy and business model is": [
+        15280,
+        819
+    ],
+    "what can you do about discrimination in the workplace in oklahoma city": [
+        18864,
+        819
+    ],
+    "what medium do radio waves travel through": [
+        19729,
+        819
+    ],
+    "difference between a hotel and motel": [
+        18812,
+        819
+    ],
+    "average salary for dental hygienist in nebraska": [
+        29414,
+        819
+    ],
+    "who is aziz hashim": [
+        20558,
+        819
+    ],
+    "what is a alm": [
+        15858,
+        819
+    ],
+    "how much money do motivational speakers make": [
+        19791,
+        819
+    ]
+}
