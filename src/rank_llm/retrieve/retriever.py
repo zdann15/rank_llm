@@ -141,16 +141,24 @@ class Retriever:
             candidates_file = Path(
                 f"{retrieve_results_dirname}/{self._retrieval_method.name}/retrieve_results_{self._dataset}_top{k}.jsonl"
             )
-            query_name = f"{self._retrieval_method.name}/retrieve_results_{self._dataset}_top{k}.jsonl"
+            query_name = f"retrieve_results/{self._retrieval_method.name}/retrieve_results_{self._dataset}_top{k}.jsonl"
             if not candidates_file.is_file():
                 try:
                     file_path = download_cached_hits(query_name)
-                    with open(file_path, "r") as f:
-                        retrieved_results = []
-                        for line in f:
-                            retrieved_results.append(
-                                from_dict(data_class=Request, data=json.loads(line))
-                            )
+                    try:
+                        with open(file_path, "r") as f:
+                            retrieved_results = []
+                            for line in f:
+                                retrieved_results.append(
+                                    from_dict(data_class=Request, data=json.loads(line))
+                                )
+                    except:
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            retrieved_results = []
+                            for line in f:
+                                retrieved_results.append(
+                                    from_dict(data_class=Request, data=json.loads(line))
+                                )
                 except ValueError as e:
                     try:
                         assert k <= 100
@@ -176,12 +184,21 @@ class Retriever:
                     and HITS_INFO[query_name]["md5"] != md5_local
                 ):
                     print("Query Cache MD5 does not match Local")
-                with open(candidates_file, "r") as f:
-                    retrieved_results = []
-                    for line in f:
-                        retrieved_results.append(
-                            from_dict(data_class=Request, data=json.loads(line))
-                        )
+                try:
+                    with open(candidates_file, "r") as f:
+                        retrieved_results = []
+                        for line in f:
+                            retrieved_results.append(
+                                from_dict(data_class=Request, data=json.loads(line))
+                            )
+                except:
+                    with open(candidates_file, "r", encoding="utf-8") as f:
+                        retrieved_results = []
+                        for line in f:
+                            print(line)
+                            retrieved_results.append(
+                                from_dict(data_class=Request, data=json.loads(line))
+                            )
 
         elif self._retrieval_mode == RetrievalMode.CUSTOM:
             candidates_file = Path(
