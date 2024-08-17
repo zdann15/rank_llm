@@ -96,8 +96,8 @@ class ZephyrReranker:
         Note:
             check 'reranker.rerank' for implementation details of reranking process.
         """
-        return self._reranker.rerank(
-            request=request,
+        return self._reranker.rerank_batch(
+            request=[request],
             rank_start=rank_start,
             rank_end=rank_end,
             window_size=window_size,

@@ -83,6 +83,42 @@ python src/rank_llm/scripts/run_rank_llm.py  --model_path=castorini/LiT5-Score-l
     --window_size=100 --variable_passages
 ```
 
+### Reranking Custom Data
+
+To rerank custom data that isn't an existing TREC dataset, you can follow the example below.
+
+First, build a `Request` object with `candidates`:
+
+```python
+from rank_llm.data import Request, Query, Candidate
+
+request = Request(
+    query=Query(text="What is the capital of France?", qid="1"),
+    candidates=[
+        Candidate(docid="1", score=0.9, doc={"text": "What is the capital of France?"}),
+        Candidate(docid="2", score=0.8, doc={"text": "The capital of India is Delhi."}),
+        Candidate(docid="3", score=0.7, doc={"text": "France hosts the Eiffel Tower."}),
+        Candidate(docid="4", score=0.642, doc={"text": "France's capital is Paris."}),
+    ]
+)
+```
+
+Next, use the `ZephyrReranker` or `VicunaReranker` classes for reranking:
+
+```python
+from rank_llm.rerank.listwise import ZephyrReranker, VicunaReranker
+
+# Using ZephyrReranker
+zephyr_reranker = ZephyrReranker()
+rerank_results = zephyr_reranker.rerank(request=request)
+print(rerank_results)
+
+# Using VicunaReranker
+vicuna_reranker = VicunaReranker()
+rerank_results = vicuna_reranker.rerank(request=request)
+print(rerank_results)
+```
+
 If you would like to contribute to the project, please refer to the [contribution guidelines](CONTRIBUTING.md).
 
 ## 🦙🐧 Model Zoo
