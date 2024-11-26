@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 import torch
 from flask import Flask, jsonify, request
@@ -35,7 +36,7 @@ def create_app(model, port, use_azure_openai=False):
         default_agent = RankListwiseOSLLM(
             model=f"castorini/first_mistral",
             name=model,
-            context_size=8192,
+            context_size=4096,
             prompt_mode=PromptMode.RANK_GPT,
             num_few_shot_examples=0,
             device="cuda",
@@ -88,7 +89,7 @@ def create_app(model, port, use_azure_openai=False):
             keys=openai_keys,
             **(get_azure_openai_args() if use_azure_openai else {}),
         )
-    elif model == "identity_reranker":
+    elif model in ["identity_reranker", "unspecified", "identity"]:
         print(f"Loading {model} model...")
         default_agent = IdentityReranker()
     else:
@@ -159,6 +160,7 @@ def create_app(model, port, use_azure_openai=False):
 
             return jsonify(response[0]), 200
         except Exception as e:
+            logging.error(f"Error during search: {e}", exc_info=True)
             return jsonify({"error": str(e)}), 500
 
     return app, port
