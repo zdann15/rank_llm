@@ -217,6 +217,62 @@ class Reranker:
                 keys=openai_keys,
                 **(get_azure_openai_args() if use_azure_openai else {}),
             )
+        elif "first_mistral" in model_path:
+            print(f"Loading {model_path} ...")
+
+            model_full_paths = {"first_mistral": "castorini/first_mistral"}
+
+            keys_and_defaults = [
+                ("context_size", 4096),
+                ("prompt_mode", PromptMode.RANK_GPT),
+                ("num_few_shot_examples", 0),
+                ("device", "cuda"),
+                ("num_gpus", 1),
+                ("variable_passages", True),
+                ("window_size", 20),
+                ("system_message", None),
+                ("vllm_batched", True),
+                ("sglang_batched", False),
+                ("use_alpha", True),
+                ("use_logits", True),
+            ]
+            [
+                context_size,
+                prompt_mode,
+                num_few_shot_examples,
+                device,
+                num_gpus,
+                variable_passages,
+                window_size,
+                system_message,
+                vllm_batched,
+                sglang_batched,
+                use_logits,
+                use_alpha,
+            ] = extract_kwargs(keys_and_defaults, **kwargs)
+            agent = RankListwiseOSLLM(
+                model=(
+                    model_full_paths[model_path]
+                    if model_path in model_full_paths
+                    else model_path
+                ),
+                name=model_path,
+                context_size=context_size,
+                prompt_mode=prompt_mode,
+                num_few_shot_examples=num_few_shot_examples,
+                device=device,
+                num_gpus=num_gpus,
+                variable_passages=variable_passages,
+                window_size=window_size,
+                system_message=system_message,
+                vllm_batched=vllm_batched,
+                sglang_batched=sglang_batched,
+                use_logits=use_logits,
+                use_alpha=use_alpha,
+            )
+
+            print(f"Completed loading {model_path}")
+
         elif "vicuna" in model_path or "zephyr" in model_path:
             # RankVicuna or RankZephyr model suite
             print(f"Loading {model_path} ...")
