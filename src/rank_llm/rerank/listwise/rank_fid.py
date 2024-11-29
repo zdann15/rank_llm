@@ -39,6 +39,7 @@ class RankFiDDistill(ListwiseRankLLM):
         precision: str = "bfloat16",
         device: str = "cuda",
         batched: bool = False,
+        name: str = "",
     ) -> None:
         """
         Creates instance of the RankFiDDistill class, a specialized version of RankLLM designed from Lit5-Distill.
@@ -49,6 +50,7 @@ class RankFiDDistill(ListwiseRankLLM):
             prompt_mode=prompt_mode,
             num_few_shot_examples=num_few_shot_examples,
             window_size=window_size,
+            name=name,
         )
         self._precision = precision
         self._tokenizer = T5Tokenizer.from_pretrained(model)
@@ -269,6 +271,9 @@ class RankFiDDistill(ListwiseRankLLM):
     def _gen_passage(query: str, index: int, passage: str) -> str:
         return f"Search Query: {query} Passage: [{index}] {passage} Relevance Ranking: "
 
+    def get_name(self) -> str:
+        return self._name
+
 
 class RankFiDScore(ListwiseRankLLM):
     def _post_init(self):
@@ -301,6 +306,7 @@ class RankFiDScore(ListwiseRankLLM):
         precision: str = "bfloat16",
         device: str = "cuda",
         batched: bool = False,
+        name: str = "",
     ) -> None:
         super().__init__(
             model=model,
@@ -308,6 +314,7 @@ class RankFiDScore(ListwiseRankLLM):
             prompt_mode=prompt_mode,
             num_few_shot_examples=num_few_shot_examples,
             window_size=window_size,
+            name=name,
         )
         self._precision = precision
         self._tokenizer = T5Tokenizer.from_pretrained(model)
@@ -548,3 +555,6 @@ class RankFiDScore(ListwiseRankLLM):
     @staticmethod
     def _gen_passage(query: str, passage: str) -> str:
         return f"question: {query} context: {passage}"
+
+    def get_name(self) -> str:
+        return self._name

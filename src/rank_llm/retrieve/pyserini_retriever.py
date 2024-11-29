@@ -31,6 +31,9 @@ class RetrievalMethod(Enum):
     OPEN_AI_ADA2 = "openai-ada2"
     REP_LLAMA = "rep-llama"
     CUSTOM_INDEX = "custom_index"
+    LANCE_FTS = "lance_fts"
+    LANCE_ARCTIC_EMBED_L = "lance_arctic_embed_l"
+    LANCE_HYBRID = "lance_hybrid"
 
     def __str__(self):
         return self.value

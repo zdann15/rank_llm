@@ -19,6 +19,7 @@ class MonoT5(PointwiseRankLLM):
         context_size: int = 512,
         device: str = "cuda",
         batch_size: int = 32,
+        name: str = "",
     ):
         super().__init__(
             model=model,
@@ -26,6 +27,7 @@ class MonoT5(PointwiseRankLLM):
             prompt_mode=prompt_mode,
             device=device,
             batch_size=batch_size,
+            name=name,
         )
 
         self._tokenizer = T5Tokenizer.from_pretrained(model)

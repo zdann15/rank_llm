@@ -38,11 +38,13 @@ class ListwiseRankLLM(RankLLM, ABC):
         num_few_shot_examples: int,
         window_size: int,
         use_alpha: bool = False,
+        name: str = "",
     ) -> None:
         super().__init__(model, context_size, prompt_mode)
         self._num_few_shot_examples = num_few_shot_examples
         self._window_size = window_size
         self._use_alpha = use_alpha
+        self._name = name
 
     def get_output_filename(
         self,
@@ -452,3 +454,6 @@ class ListwiseRankLLM(RankLLM, ABC):
         # For Japanese should cut by character: content = content[:int(max_length)]
         content = " ".join(content.split()[: int(max_length)])
         return self._replace_number(content)
+
+    def get_name(self) -> str:
+        return self._name

@@ -2,6 +2,7 @@ from .indices_dict import INDICES
 from .pyserini_retriever import PyseriniRetriever, RetrievalMethod
 from .repo_info import HITS_INFO
 from .retriever import RetrievalMode, Retriever
+from .service_lancedb_retriever import ServiceLanceDBRetriever
 from .service_retriever import ServiceRetriever
 from .topics_dict import TOPICS
 from .utils import (
@@ -18,6 +19,7 @@ __all__ = [
     "RetrievalMethod",
     "PyseriniRetriever",
     "ServiceRetriever",
+    "ServiceLanceDBRetriever",
     "Retriever",
     "RetrievalMode",
     "download_and_unpack_hits",

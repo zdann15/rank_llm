@@ -30,11 +30,13 @@ class PointwiseRankLLM(RankLLM, ABC):
         device: str = "cuda",
         filename: str = "",
         batch_size: int = 32,
+        name: str = "",
     ) -> None:
         super().__init__(model, context_size, prompt_mode)
         self._device = device
         self._filename = filename
         self._batch_size = batch_size
+        self._name = name
 
     def rerank_batch(
         self,
@@ -182,3 +184,6 @@ class PointwiseRankLLM(RankLLM, ABC):
         # For Japanese should cut by character: content = content[:int(max_length)]
         content = " ".join(content.split()[: int(max_length)])
         return self._replace_number(content)
+
+    def get_name(self) -> str:
+        return self._name

@@ -355,18 +355,34 @@ class Reranker:
                     if model_path in model_full_paths
                     else model_path
                 ),
+                name=model_path,
                 prompt_mode=prompt_mode,
                 context_size=context_size,
                 device=device,
                 batch_size=batch_size,
             )
 
-        elif "lit5-distill" in model_path.lower():
+        elif "lit5_distill" in model_path.lower():
+            full_path_mapping = {
+                "lit5_distill_v2": "castorini/LiT5-Distill-large-v2",
+                "lit5_distill": "castorini/LiT5-Distill-large",
+            }
+
+            if model_path.lower() in full_path_mapping:
+                full_model_path = full_path_mapping[model_path.lower()]
+                window_size = 100 if "v2" in model_path.lower() else 20
+                step_size = 50 if "v2" in model_path.lower() else 10
+            else:
+                full_model_path = model_path
+                window_size = 20
+                step_size = 10
+
             keys_and_defaults = [
                 ("context_size", 150),
                 ("prompt_mode", PromptMode.LiT5),
                 ("num_few_shot_examples", 0),
-                ("window_size", 20),
+                ("window_size", window_size),
+                ("step_size", step_size),
                 ("precision", "bfloat16"),
                 ("device", "cuda"),
                 # reuse this parameter, but its not for "vllm", but only for "batched"
@@ -377,28 +393,40 @@ class Reranker:
                 prompt_mode,
                 num_few_shot_examples,
                 window_size,
+                step_size,
                 precision,
                 device,
                 vllm_batched,
             ) = extract_kwargs(keys_and_defaults, **kwargs)
 
             agent = RankFiDDistill(
-                model=model_path,
+                model=full_model_path,
+                name=model_path,
                 context_size=context_size,
                 prompt_mode=prompt_mode,
                 num_few_shot_examples=num_few_shot_examples,
                 window_size=window_size,
+                step_size=step_size,
                 precision=precision,
                 device=device,
                 batched=vllm_batched,
             )
             print(f"Completed loading {model_path}")
         elif "lit5-score" in model_path.lower():
+            full_path_mapping = {
+                "lit5_score": "castorini/LiT5-Score-large",
+            }
+            if model_path.lower() in full_path_mapping:
+                full_model_path = full_path_mapping[model_path.lower()]
+            else:
+                full_model_path = model_path
+
             keys_and_defaults = [
                 ("context_size", 150),
                 ("prompt_mode", PromptMode.LiT5),
                 ("num_few_shot_examples", 0),
-                ("window_size", 100),
+                ("window_size", 20),
+                ("step_size", 10),
                 ("precision", "bfloat16"),
                 ("device", "cuda"),
                 # reuse this parameter, but its not for "vllm", but only for "batched"
@@ -409,17 +437,20 @@ class Reranker:
                 prompt_mode,
                 num_few_shot_examples,
                 window_size,
+                step_size,
                 precision,
                 device,
                 vllm_batched,
             ) = extract_kwargs(keys_and_defaults, **kwargs)
 
             agent = RankFiDScore(
-                model=model_path,
+                model=full_model_path,
+                name=model_path,
                 context_size=context_size,
                 prompt_mode=prompt_mode,
                 num_few_shot_examples=num_few_shot_examples,
                 window_size=window_size,
+                step_size=step_size,
                 precision=precision,
                 device=device,
                 batched=vllm_batched,

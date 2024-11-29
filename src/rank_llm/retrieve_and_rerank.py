@@ -9,6 +9,7 @@ from rank_llm.retrieve import (
     RetrievalMethod,
     RetrievalMode,
     Retriever,
+    ServiceLanceDBRetriever,
     ServiceRetriever,
 )
 
@@ -90,7 +91,9 @@ def retrieve_and_rerank(
     # generate trec_eval file & evaluate for named datasets only
     if isinstance(dataset, str) and reranker.get_agent() is not None:
         file_name = reranker.write_rerank_results(
-            retrieval_method.name,
+            retrieval_method
+            if isinstance(retrieval_method, str)
+            else retrieval_method.name,
             rerank_results,
             shuffle_candidates,
             top_k_candidates=top_k_retrieve,
@@ -158,9 +161,15 @@ def retrieve(
             raise ValueError("Must provide a dataset")
 
         if interactive:
-            service_retriever = ServiceRetriever(
-                retrieval_method=retrieval_method, retrieval_mode=retrieval_mode
-            )
+            if str(retrieval_method) in [str(RetrievalMethod.BM25), "bm25"]:
+                service_retriever = ServiceRetriever(
+                    retrieval_method=retrieval_method, retrieval_mode=retrieval_mode
+                )
+            else:
+                service_retriever = ServiceLanceDBRetriever(
+                    retrieval_method=retrieval_method, retrieval_mode=retrieval_mode
+                )
+
             if isinstance(dataset, str):
                 dataset = [dataset]
             if isinstance(dataset, list):

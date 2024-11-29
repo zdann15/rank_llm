@@ -11,6 +11,8 @@ from rank_llm.rerank import (
     get_openai_api_key,
 )
 from rank_llm.rerank.listwise import RankListwiseOSLLM, SafeOpenai
+from rank_llm.rerank.listwise.rank_fid import RankFiDDistill, RankFiDScore
+from rank_llm.rerank.pointwise.monot5 import MonoT5
 from rank_llm.retrieve import RetrievalMethod, RetrievalMode
 from rank_llm.retrieve_and_rerank import retrieve_and_rerank
 
@@ -47,6 +49,54 @@ def create_app(model, port, use_azure_openai=False):
             use_alpha=True,
             use_logits=True,
             vllm_batched=True,
+        )
+    elif "monot5" in model:
+        print(f"Loading {model} model...")
+        default_agent = MonoT5(
+            model=f"castorini/{model}-3b-msmarco-10k",
+            prompt_mode=PromptMode.MONOT5,
+            context_size=512,
+            device="cuda",
+            batch_size=64,
+        )
+    elif "lit5_distill" in model.lower():
+        if "v2" in model.lower():
+            window_size = 100
+            step_size = 50
+        else:
+            window_size = 20
+            step_size = 10
+
+        full_path_mapping = {
+            "lit5_distill_v2": "castorini/LiT5-Distill-large-v2",
+            "lit5_distill": "castorini/LiT5-Distill-large",
+        }
+        full_model_path = full_path_mapping[model.lower()]
+
+        print(f"Loading {model} model...")
+        default_agent = RankFiDDistill(
+            model=full_model_path,
+            context_size=150,
+            prompt_mode=PromptMode.LiT5,
+            num_few_shot_examples=0,
+            window_size=window_size,
+            step_size=step_size,
+            precision="bfloat16",
+            device="cuda",
+            batched=False,
+        )
+    elif "lit5_score" in model.lower():
+        print(f"Loading {model} model...")
+        full_model_path = "castorini/LiT5-Score-large"
+        default_agent = RankFiDScore(
+            model=full_model_path,
+            context_size=150,
+            prompt_mode=PromptMode.LiT5,
+            num_few_shot_examples=0,
+            window_size=100,
+            precision="bfloat16",
+            device="cuda",
+            batched=False,
         )
     elif model == "rank_zephyr":
         print(f"Loading {model} model...")
@@ -126,6 +176,12 @@ def create_app(model, port, use_azure_openai=False):
 
         if "bm25" in retrieval_method.lower():
             _retrieval_method = RetrievalMethod.BM25
+        elif "lance_fts" in retrieval_method.lower():
+            _retrieval_method = RetrievalMethod.LANCE_FTS
+        elif "lance_arctic_embed_l" in retrieval_method.lower():
+            retrieval_method = RetrievalMethod.LANCE_ARCTIC_EMBED_L
+        elif "lance_hybrid" in retrieval_method.lower():
+            retrieval_method = RetrievalMethod.LANCE_HYBRID
         else:
             return jsonify({"error": str("Retrieval method must be BM25")}), 500
 
@@ -151,7 +207,7 @@ def create_app(model, port, use_azure_openai=False):
                 populate_exec_summary=False,
                 default_agent=default_agent,
                 num_passes=num_passes,
-                retrieval_method=_retrieval_method,
+                retrieval_method=retrieval_method,
                 print_prompts_responses=False,
             )
 
