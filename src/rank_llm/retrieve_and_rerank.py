@@ -1,4 +1,5 @@
 import copy
+import time
 from typing import Any, Dict, List, Union
 
 from rank_llm.data import Query, Request
@@ -68,7 +69,7 @@ def retrieve_and_rerank(
         # Reranker is of type RankLLM
         for pass_ct in range(num_passes):
             print(f"Pass {pass_ct + 1} of {num_passes}:")
-
+            start_time = time.time()
             rerank_results = reranker.rerank_batch(
                 requests,
                 rank_end=top_k_retrieve,
@@ -77,6 +78,9 @@ def retrieve_and_rerank(
                 logging=print_prompts_responses,
                 top_k_retrieve=top_k_retrieve,
                 **kwargs,
+            )
+            print(
+                f"Total: {len(requests)} queries, reranked: {len(rerank_results)} queries in {time.time() - start_time} seconds"
             )
 
         if num_passes > 1:

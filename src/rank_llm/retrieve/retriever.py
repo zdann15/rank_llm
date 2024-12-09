@@ -139,9 +139,9 @@ class Retriever:
         """
         if self._retrieval_mode == RetrievalMode.DATASET:
             candidates_file = Path(
-                f"{retrieve_results_dirname}/{self._retrieval_method.name}/retrieve_results_{self._dataset}_top{k}.jsonl"
+                f"{retrieve_results_dirname}/{self._retrieval_method.name}/retrieve_results_{self._dataset}_top100.jsonl"
             )
-            query_name = f"{self._retrieval_method.name}/retrieve_results_{self._dataset}_top{k}.jsonl"
+            query_name = f"{self._retrieval_method.name}/retrieve_results_{self._dataset}_top100.jsonl"
             if not candidates_file.is_file():
                 try:
                     file_path = download_cached_hits(query_name)
