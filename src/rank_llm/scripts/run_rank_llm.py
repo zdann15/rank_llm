@@ -183,7 +183,7 @@ if __name__ == "__main__":
     infer_backend_group.add_argument(
         "--vllm_batched",
         action="store_true",
-        help="whether to run the model in batches",
+        help="whether to run the model in batches using vllm",
     )
     parser.add_argument(
         "--use_logits",

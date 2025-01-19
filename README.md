@@ -98,6 +98,8 @@ python src/rank_llm/scripts/run_rank_llm.py  --model_path=gpt-4o --top_k_candida
 Note that the `--prompt_mode` is set to `rank_GPT_APEER` to use the LLM refined prompt from [APEER](https://arxiv.org/abs/2406.14449).
 This can be changed to `rank_GPT` to use the original prompt.
 
+Your `OPEN_AI_API_KEY` should be added to the `.env.local` file under the root directory. For using the Azure API version(`--use_azure_openai`), you should specify `AZURE_OPENAI_API_BASE` and `AZURE_OPENAI_API_VERSION` in addition to the API key. 
+
 ### Run end to end - LiT5
 
 We can run the LiT5-Distill V2 model (which could rerank 100 documents in a single pass) with the following command:
